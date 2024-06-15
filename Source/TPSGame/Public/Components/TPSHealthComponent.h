@@ -6,23 +6,62 @@
 #include "Components/ActorComponent.h"
 #include "TPSHealthComponent.generated.h"
 
+class UPhysicalMaterial;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, NewHealth, float, NewHealthPercent);
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TPSGAME_API UTPSHealthComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
-	UTPSHealthComponent();
+public:
+    UTPSHealthComponent();
+
+public:
+    float GetHealth() const { return Health; }
+
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    float GetHealthPercent() const { return Health / MaxHealth; }
+
+    bool IsDead() const { return FMath::IsNearlyZero(Health); }
+
+    UPROPERTY(BlueprintAssignable, Category = "Health")
+    FOnHealthChangedSignature OnHealthChanged;
+
+    UPROPERTY(BlueprintAssignable, Category = "Health")
+    FOnDeathSignature OnDeath;
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+    UFUNCTION()
+    void OnRep_Health();
 
-		
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
+    float MaxHealth = 100.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
+    TMap<UPhysicalMaterial*, float> DamageModifiers;
+
+private:
+    UFUNCTION()
+    void OnTakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation,
+        class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType,
+        AActor* DamageCauser);
+
+    UFUNCTION()
+    void OnTakeRadialDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, const FHitResult&
+        HitInfo, class AController* InstigatedBy, AActor* DamageCauser);
+
+    void ApplyDamage(float Damage, AController* InstigatedBy);
+
+    void SetHealth(float NewHealth);
+
+    float GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName);
+
+    UPROPERTY(ReplicatedUsing = OnRep_Health)
+    float Health = 100.0f;
 };

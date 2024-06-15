@@ -6,15 +6,19 @@
 #include "GameFramework/Character.h"
 #include "TPSBaseCharacter.generated.h"
 
+class UTPSHealthComponent;
+
 UCLASS()
 class TPSGAME_API ATPSBaseCharacter : public ACharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	ATPSBaseCharacter();
+    ATPSBaseCharacter();
 
 protected:
-	void SetupCharacterMesh();
+    void SetupCharacterMesh();
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    TObjectPtr<UTPSHealthComponent> TPSHealthComponent;
 };

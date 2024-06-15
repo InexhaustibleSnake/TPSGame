@@ -1,15 +1,18 @@
 // This project is made for a test assignment
 
 #include "Characters/TPSBaseCharacter.h"
+#include "Components/TPSHealthComponent.h"
 
 ATPSBaseCharacter::ATPSBaseCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
+
+    TPSHealthComponent = CreateDefaultSubobject<UTPSHealthComponent>("TPSHealthComponent");
 
     SetupCharacterMesh();
 }
 
-void ATPSBaseCharacter::SetupCharacterMesh() 
+void ATPSBaseCharacter::SetupCharacterMesh()
 {
     if (!GetMesh()) return;
 
@@ -26,5 +29,3 @@ void ATPSBaseCharacter::SetupCharacterMesh()
 
     GetMesh()->SetRelativeLocationAndRotation(MeshLocation, MeshRotation);
 }
-
-

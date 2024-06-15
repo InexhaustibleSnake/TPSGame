@@ -1,34 +1,82 @@
 // This project is made for a test assignment
 
-
 #include "Components/TPSHealthComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "GameFramework/Character.h"
 
-// Sets default values for this component's properties
 UTPSHealthComponent::UTPSHealthComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
+    SetIsReplicatedByDefault(true);
 }
 
-
-// Called when the game starts
 void UTPSHealthComponent::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	// ...
-	
+    if (GetOwner())
+    {
+        GetOwner()->OnTakePointDamage.AddDynamic(this, &UTPSHealthComponent::OnTakePointDamage);
+        GetOwner()->OnTakeRadialDamage.AddDynamic(this, &UTPSHealthComponent::OnTakeRadialDamage);
+    }
 }
 
-
-// Called every frame
-void UTPSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTPSHealthComponent::OnTakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation,
+    class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType,
+    AActor* DamageCauser)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    const auto FinalDamage = Damage * GetPointDamageModifier(DamagedActor, BoneName);
 
-	// ...
+    ApplyDamage(FinalDamage, InstigatedBy);
 }
 
+void UTPSHealthComponent::OnTakeRadialDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, FVector Origin,
+    const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser)
+{
+    ApplyDamage(Damage, InstigatedBy);
+}
+
+float UTPSHealthComponent::GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName)
+{
+    const auto Character = Cast<ACharacter>(DamagedActor);
+    if (!Character || !Character->GetMesh() || !Character->GetMesh()->GetBodyInstance(BoneName)) return 1.0f;
+
+    const auto PhysMaterial = Character->GetMesh()->GetBodyInstance(BoneName)->GetSimplePhysicalMaterial();
+    if (!PhysMaterial || !DamageModifiers.Contains(PhysMaterial)) return 1.0f;
+
+    return DamageModifiers[PhysMaterial];
+}
+
+void UTPSHealthComponent::ApplyDamage(float Damage, AController* InstigatedBy)
+{
+    if (Damage <= 0.0f || IsDead() || !GetWorld()) return;
+
+    SetHealth(Health - Damage);
+
+    if (IsDead())
+    {
+        OnDeath.Broadcast();
+    }
+}
+
+void UTPSHealthComponent::SetHealth(float NewHealth)
+{
+    const auto NextHealth = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
+    const auto HealthDelta = NextHealth - Health;
+
+    Health = NextHealth;
+    OnRep_Health();
+}
+
+void UTPSHealthComponent::OnRep_Health()
+{
+    OnHealthChanged.Broadcast(GetHealth(), GetHealthPercent());
+}
+
+void UTPSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME_CONDITION(UTPSHealthComponent, Health, COND_OwnerOnly);
+}
