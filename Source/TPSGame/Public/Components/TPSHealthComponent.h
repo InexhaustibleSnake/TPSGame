@@ -65,6 +65,8 @@ private:
 
     float GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName);
 
+    AController* GetOwnerController() const;
+
     UPROPERTY(ReplicatedUsing = OnRep_Health)
     float Health = 100.0f;
 

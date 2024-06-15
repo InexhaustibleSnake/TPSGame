@@ -6,6 +6,8 @@
 #include "Logic/GameModes/TPSBaseGameMode.h"
 #include "TPSGameModeDeathMatch.generated.h"
 
+class ATPSDefaultPlayerState;
+
 UCLASS()
 class TPSGAME_API ATPSGameModeDeathMatch : public ATPSBaseGameMode
 {
@@ -13,4 +15,15 @@ class TPSGAME_API ATPSGameModeDeathMatch : public ATPSBaseGameMode
 
 public:
     ATPSGameModeDeathMatch();
+
+    void OnPlayerKilled(AController* KillerController, AController* VictimController);
+
+    void RequestRespawn(AController* Controller);
+
+protected:
+    void RespawnOnePlayer(AController* Controller);
+
+    void StartRespawn(AController* Controller);
+
+    void AddPlayerScores(AController* Controller, float Amount);
 };

@@ -3,6 +3,7 @@
 #include "Components/TPSHealthComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
+#include "Logic/GameModes/TPSGameModeDeathMatch.h"
 
 UTPSHealthComponent::UTPSHealthComponent()
 {
@@ -48,6 +49,13 @@ float UTPSHealthComponent::GetPointDamageModifier(AActor* DamagedActor, const FN
     return DamageModifiers[PhysMaterial];
 }
 
+AController* UTPSHealthComponent::GetOwnerController() const
+{
+    const auto OwnerPawn = Cast<APawn>(GetOwner());
+
+    return OwnerPawn ? OwnerPawn->GetController() : nullptr;
+}
+
 void UTPSHealthComponent::ApplyDamage(float Damage, AController* InstigatedBy)
 {
     if (Damage <= 0.0f || IsDead() || !GetWorld()) return;
@@ -57,6 +65,12 @@ void UTPSHealthComponent::ApplyDamage(float Damage, AController* InstigatedBy)
     if (IsDead())
     {
         OnDeath.Broadcast();
+
+        if (!GetWorld()) return;
+        const auto GameMode = Cast<ATPSGameModeDeathMatch>(GetWorld()->GetAuthGameMode());
+        if (!GameMode) return;
+
+        GameMode->OnPlayerKilled(InstigatedBy, GetOwnerController());
     }
 }
 
