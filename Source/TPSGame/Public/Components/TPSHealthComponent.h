@@ -40,6 +40,9 @@ protected:
     UFUNCTION()
     void OnRep_Health();
 
+    UFUNCTION()
+    void OnRep_Dead();
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
     float MaxHealth = 100.0f;
 
@@ -53,8 +56,8 @@ private:
         AActor* DamageCauser);
 
     UFUNCTION()
-    void OnTakeRadialDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, const FHitResult&
-        HitInfo, class AController* InstigatedBy, AActor* DamageCauser);
+    void OnTakeRadialDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin,
+        const FHitResult& HitInfo, class AController* InstigatedBy, AActor* DamageCauser);
 
     void ApplyDamage(float Damage, AController* InstigatedBy);
 
@@ -64,4 +67,7 @@ private:
 
     UPROPERTY(ReplicatedUsing = OnRep_Health)
     float Health = 100.0f;
+
+    UPROPERTY(ReplicatedUsing = OnRep_Dead)
+    bool Dead = false;
 };

@@ -67,6 +67,12 @@ void UTPSHealthComponent::SetHealth(float NewHealth)
 
     Health = NextHealth;
     OnRep_Health();
+
+    if (IsDead())
+    {
+        Dead = true;
+        OnRep_Dead();
+    }
 }
 
 void UTPSHealthComponent::OnRep_Health()
@@ -74,9 +80,19 @@ void UTPSHealthComponent::OnRep_Health()
     OnHealthChanged.Broadcast(GetHealth(), GetHealthPercent());
 }
 
+void UTPSHealthComponent::OnRep_Dead()
+{
+    const auto OwnerCharacter = Cast<ACharacter>(GetOwner());
+    if (!OwnerCharacter || !OwnerCharacter->GetMesh()) return;
+
+    OwnerCharacter->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    OwnerCharacter->GetMesh()->SetSimulatePhysics(true);
+}
+
 void UTPSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME_CONDITION(UTPSHealthComponent, Health, COND_OwnerOnly);
+    DOREPLIFETIME(UTPSHealthComponent, Dead);
 }
