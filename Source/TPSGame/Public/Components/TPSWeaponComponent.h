@@ -22,6 +22,17 @@ protected:
 
     void InitWeapons();
 
+    void EquipWeapon(const int32 WeaponIndex);
+
+    UFUNCTION(Server, Reliable)
+    void ServerEquipWeapon(const int32 WeaponIndex);
+    void ServerEquipWeapon_Implementation(const int32 WeaponIndex);
+
+    UFUNCTION()
+    void OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon);
+
+    void AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName SocketName);
+
     FTransform GetSocketTransform(const FName SocketName) const;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
@@ -30,7 +41,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
     TArray<TObjectPtr<ATPSBaseWeapon>> SpawnedWeapons;
 
-    UPROPERTY(Replicated, BlueprintReadOnly, Category = "WeaponComponent")
+    UPROPERTY(ReplicatedUsing = OnRep_CurrentWeapon, BlueprintReadOnly, Category = "WeaponComponent")
     TObjectPtr<ATPSBaseWeapon> CurrentWeapon;
 
     TObjectPtr<USkeletalMeshComponent> GetOwnerMesh() const;
@@ -39,5 +50,5 @@ protected:
     FName WeaponSocketName = "WeaponSocket";
 
     UPROPERTY(BlueprintReadOnly, Category = "WeaponComponent")
-    FName WeaponSpineSocket = "WeaponSpineSocket";
+    FName WeaponSpineSocketName = "WeaponSpineSocket";
 };

@@ -27,12 +27,53 @@ void UTPSWeaponComponent::InitWeapons()
     {
         if (!OneWeapon) continue;
 
-        auto SpawnedWeapon = GetWorld()->SpawnActorDeferred<ATPSBaseWeapon>(OneWeapon, GetSocketTransform(WeaponSpineSocket), GetOwner());
+        auto SpawnedWeapon =
+            GetWorld()->SpawnActorDeferred<ATPSBaseWeapon>(OneWeapon, GetSocketTransform(WeaponSpineSocketName), GetOwner());
         if (!SpawnedWeapon) continue;
 
-        SpawnedWeapon->AttachToComponent(GetOwnerMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSpineSocket);
+        SpawnedWeapon->AttachToComponent(GetOwnerMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSpineSocketName);
         SpawnedWeapons.AddUnique(SpawnedWeapon);
     }
+}
+
+void UTPSWeaponComponent::EquipWeapon(const int32 WeaponIndex)
+{
+    if (!GetOwner() || !SpawnedWeapons.IsValidIndex(WeaponIndex) || SpawnedWeapons.IsValidIndex(WeaponIndex) == CurrentWeapon) return;
+
+    if (!GetOwner()->HasAuthority())
+    {
+        ServerEquipWeapon(WeaponIndex);
+    }
+
+    ATPSBaseWeapon* LocalPreviousWeapon = CurrentWeapon;
+
+    CurrentWeapon = SpawnedWeapons[WeaponIndex];
+    OnRep_CurrentWeapon(LocalPreviousWeapon);
+}
+
+void UTPSWeaponComponent::ServerEquipWeapon_Implementation(const int32 WeaponIndex)
+{
+    EquipWeapon(WeaponIndex);
+}
+
+void UTPSWeaponComponent::OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon)
+{
+    if (PreviousWeapon)
+    {
+        AttachWeaponToMesh(PreviousWeapon, WeaponSpineSocketName);
+    }
+
+    if (CurrentWeapon)
+    {
+        AttachWeaponToMesh(CurrentWeapon, WeaponSocketName);
+    }
+}
+
+void UTPSWeaponComponent::AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName SocketName)
+{
+    if (!Weapon) return;
+
+    Weapon->AttachToComponent(GetOwnerMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 }
 
 FTransform UTPSWeaponComponent::GetSocketTransform(const FName SocketName) const
