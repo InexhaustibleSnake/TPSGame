@@ -33,6 +33,20 @@ void UTPSWeaponComponent::NextWeapon()
     EquipWeapon((CurrentWeaponIndex + 1) % SpawnedWeapons.Num());
 }
 
+void UTPSWeaponComponent::StartFire()
+{
+    if (!CurrentWeapon) return;
+
+    CurrentWeapon->StartFire();
+}
+
+void UTPSWeaponComponent::StopFire()
+{
+    if (!CurrentWeapon) return;
+
+    CurrentWeapon->StopFire();
+}
+
 void UTPSWeaponComponent::InitWeapons()
 {
     if (!GetWorld()) return;
@@ -111,6 +125,6 @@ void UTPSWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME_CONDITION(UTPSWeaponComponent, CurrentWeapon, COND_SkipOwner);
+    DOREPLIFETIME(UTPSWeaponComponent, CurrentWeapon);
     DOREPLIFETIME_CONDITION(UTPSWeaponComponent, SpawnedWeapons, COND_OwnerOnly);
 }

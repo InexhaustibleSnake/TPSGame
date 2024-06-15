@@ -43,6 +43,9 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATPSPlayerCharacter::Look);
 
+        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::StartFire);
+        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &ATPSPlayerCharacter::StopFire);
+
         EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::ChangeWeapon);
     }
 }
@@ -72,4 +75,18 @@ void ATPSPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
     if (!TPSWeaponComponent) return;
 
     TPSWeaponComponent->NextWeapon();
+}
+
+void ATPSPlayerCharacter::StartFire()
+{
+    if (!TPSWeaponComponent) return;
+
+    TPSWeaponComponent->StartFire();
+}
+
+void ATPSPlayerCharacter::StopFire()
+{
+    if (!TPSWeaponComponent) return;
+
+    TPSWeaponComponent->StopFire();
 }

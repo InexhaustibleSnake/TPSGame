@@ -18,6 +18,9 @@ public:
 
     void NextWeapon();
 
+    void StartFire();
+    void StopFire();
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

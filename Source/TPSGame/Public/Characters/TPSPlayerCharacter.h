@@ -31,6 +31,9 @@ protected:
 
     void ChangeWeapon(const FInputActionValue& Value);
 
+    void StartFire();
+    void StopFire();
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UCameraComponent> MainCamera;
 
