@@ -29,6 +29,8 @@ protected:
 
     void EquipWeapon(const int32 WeaponIndex);
 
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
     UFUNCTION(Server, Reliable)
     void ServerEquipWeapon(const int32 WeaponIndex);
     void ServerEquipWeapon_Implementation(const int32 WeaponIndex);

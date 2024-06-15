@@ -121,6 +121,19 @@ TObjectPtr<USkeletalMeshComponent> UTPSWeaponComponent::GetOwnerMesh() const
     return OwnerCharacter->GetMesh();
 }
 
+void UTPSWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    CurrentWeapon = nullptr;
+    for (auto Weapon : SpawnedWeapons)
+    {
+        Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+        Weapon->Destroy();
+    }
+    SpawnedWeapons.Empty();
+
+    Super::EndPlay(EndPlayReason);
+}
+
 void UTPSWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
