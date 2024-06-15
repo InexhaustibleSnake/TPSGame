@@ -120,6 +120,11 @@ bool ATPSBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
     return true;
 }
 
+FVector ATPSBaseWeapon::GetMuzzleWorldLocation() const
+{
+    return WeaponMesh->GetSocketLocation(MuzzleSocketName);
+}
+
 void ATPSBaseWeapon::OnRep_CurrentShot() {}
 
 UNiagaraComponent* ATPSBaseWeapon::SpawnMuzzleFX()

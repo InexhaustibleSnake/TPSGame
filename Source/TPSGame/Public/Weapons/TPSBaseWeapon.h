@@ -68,6 +68,8 @@ protected:
 
     bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
 
+    FVector GetMuzzleWorldLocation() const;
+
     UFUNCTION()
     virtual void OnRep_CurrentShot();
 
