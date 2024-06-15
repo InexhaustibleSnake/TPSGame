@@ -42,6 +42,8 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSPlayerCharacter::Move);
 
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATPSPlayerCharacter::Look);
+
+        EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::ChangeWeapon);
     }
 }
 
@@ -63,4 +65,11 @@ void ATPSPlayerCharacter::Look(const FInputActionValue& Value)
 
     AddControllerYawInput(LookVector.X * DeltatTime * LookInputScale.X);
     AddControllerPitchInput(LookVector.Y * DeltatTime * LookInputScale.Y);
+}
+
+void ATPSPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
+{
+    if (!TPSWeaponComponent) return;
+
+    TPSWeaponComponent->NextWeapon();
 }

@@ -16,6 +16,8 @@ class TPSGAME_API UTPSWeaponComponent : public UActorComponent
 public:
     UTPSWeaponComponent();
 
+    void NextWeapon();
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

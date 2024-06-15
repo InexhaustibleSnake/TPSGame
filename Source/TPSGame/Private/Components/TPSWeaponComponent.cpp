@@ -20,6 +20,13 @@ void UTPSWeaponComponent::BeginPlay()
     EquipWeapon(0);
 }
 
+void UTPSWeaponComponent::NextWeapon() 
+{
+    int32 CurrentWeaponIndex = CurrentWeapon ? SpawnedWeapons.IndexOfByKey(CurrentWeapon) : 0;
+
+    EquipWeapon((CurrentWeaponIndex + 1) % SpawnedWeapons.Num());
+}
+
 void UTPSWeaponComponent::InitWeapons()
 {
     if (!GetWorld()) return;

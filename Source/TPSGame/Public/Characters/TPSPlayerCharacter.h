@@ -29,6 +29,8 @@ protected:
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
 
+    void ChangeWeapon(const FInputActionValue& Value);
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UCameraComponent> MainCamera;
 
@@ -55,6 +57,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     TObjectPtr<UInputAction> AimAction;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
+    TObjectPtr<UInputAction> ChangeWeaponAction;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     FVector2D LookInputScale = FVector2D(90.0f, 90.0f);
