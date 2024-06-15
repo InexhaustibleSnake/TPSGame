@@ -16,13 +16,19 @@ void UTPSWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    InitWeapons();
+    if (GetOwner() && GetOwner()->HasAuthority())
+    {
+        InitWeapons();
+    }
+
     EquipWeapon(0);
 }
 
-void UTPSWeaponComponent::NextWeapon() 
+void UTPSWeaponComponent::NextWeapon()
 {
     int32 CurrentWeaponIndex = CurrentWeapon ? SpawnedWeapons.IndexOfByKey(CurrentWeapon) : 0;
+
+    int32 WeaponToEquipIndex = (CurrentWeaponIndex + 1) % SpawnedWeapons.Num();
 
     EquipWeapon((CurrentWeaponIndex + 1) % SpawnedWeapons.Num());
 }
@@ -106,4 +112,5 @@ void UTPSWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME_CONDITION(UTPSWeaponComponent, CurrentWeapon, COND_SkipOwner);
+    DOREPLIFETIME_CONDITION(UTPSWeaponComponent, SpawnedWeapons, COND_OwnerOnly);
 }

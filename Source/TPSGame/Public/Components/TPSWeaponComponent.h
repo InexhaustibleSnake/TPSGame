@@ -40,7 +40,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
     TArray<TSubclassOf<ATPSBaseWeapon>> AvaibleWeaponsClasses;
 
-    UPROPERTY(BlueprintReadOnly, Category = "WeaponComponent")
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "WeaponComponent")
     TArray<TObjectPtr<ATPSBaseWeapon>> SpawnedWeapons;
 
     UPROPERTY(ReplicatedUsing = OnRep_CurrentWeapon, BlueprintReadOnly, Category = "WeaponComponent")
