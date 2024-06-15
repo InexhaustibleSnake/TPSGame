@@ -17,6 +17,7 @@ void UTPSWeaponComponent::BeginPlay()
     Super::BeginPlay();
 
     InitWeapons();
+    EquipWeapon(0);
 }
 
 void UTPSWeaponComponent::InitWeapons()
@@ -25,11 +26,10 @@ void UTPSWeaponComponent::InitWeapons()
 
     for (auto OneWeapon : AvaibleWeaponsClasses)
     {
-        if (!OneWeapon) continue;
-
-        auto SpawnedWeapon =
-            GetWorld()->SpawnActorDeferred<ATPSBaseWeapon>(OneWeapon, GetSocketTransform(WeaponSpineSocketName), GetOwner());
+        auto SpawnedWeapon = GetWorld()->SpawnActor<ATPSBaseWeapon>(OneWeapon);
         if (!SpawnedWeapon) continue;
+
+        SpawnedWeapon->SetOwner(GetOwner());
 
         SpawnedWeapon->AttachToComponent(GetOwnerMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSpineSocketName);
         SpawnedWeapons.AddUnique(SpawnedWeapon);
@@ -38,7 +38,7 @@ void UTPSWeaponComponent::InitWeapons()
 
 void UTPSWeaponComponent::EquipWeapon(const int32 WeaponIndex)
 {
-    if (!GetOwner() || !SpawnedWeapons.IsValidIndex(WeaponIndex) || SpawnedWeapons.IsValidIndex(WeaponIndex) == CurrentWeapon) return;
+    if (!GetOwner() || !SpawnedWeapons.IsValidIndex(WeaponIndex) || SpawnedWeapons[WeaponIndex] == CurrentWeapon) return;
 
     if (!GetOwner()->HasAuthority())
     {
@@ -67,6 +67,11 @@ void UTPSWeaponComponent::OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon)
     {
         AttachWeaponToMesh(CurrentWeapon, WeaponSocketName);
     }
+
+    auto PlayerCharacter = Cast<ACharacter>(GetOwner());
+    if (!PlayerCharacter) return;
+
+    PlayerCharacter->PlayAnimMontage(EquipMontage);
 }
 
 void UTPSWeaponComponent::AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName SocketName)

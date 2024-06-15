@@ -38,17 +38,20 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
     TArray<TSubclassOf<ATPSBaseWeapon>> AvaibleWeaponsClasses;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
+    UPROPERTY(BlueprintReadOnly, Category = "WeaponComponent")
     TArray<TObjectPtr<ATPSBaseWeapon>> SpawnedWeapons;
 
     UPROPERTY(ReplicatedUsing = OnRep_CurrentWeapon, BlueprintReadOnly, Category = "WeaponComponent")
-    TObjectPtr<ATPSBaseWeapon> CurrentWeapon;
+    TObjectPtr<ATPSBaseWeapon> CurrentWeapon = nullptr;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponComponent")
+    TObjectPtr<UAnimMontage> EquipMontage = nullptr;
 
     TObjectPtr<USkeletalMeshComponent> GetOwnerMesh() const;
 
-    UPROPERTY(BlueprintReadOnly, Category = "WeaponComponent")
-    FName WeaponSocketName = "WeaponSocket";
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
+    FName WeaponSocketName = "WeaponPoint";
 
-    UPROPERTY(BlueprintReadOnly, Category = "WeaponComponent")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
     FName WeaponSpineSocketName = "WeaponSpineSocket";
 };
