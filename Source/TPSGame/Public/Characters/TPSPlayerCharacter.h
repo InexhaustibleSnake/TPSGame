@@ -9,6 +9,8 @@
 class UCameraComponent;
 class USpringArmComponent;
 
+class UTPSWeaponComponent;
+
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -32,6 +34,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<USpringArmComponent> SpringArm;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    TObjectPtr<UTPSWeaponComponent> TPSWeaponComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;

@@ -4,6 +4,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
+#include "Components/TPSWeaponComponent.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -15,6 +17,8 @@ ATPSPlayerCharacter::ATPSPlayerCharacter()
 
     MainCamera = CreateDefaultSubobject<UCameraComponent>("MainCamera");
     MainCamera->SetupAttachment(SpringArm);
+
+    TPSWeaponComponent = CreateDefaultSubobject<UTPSWeaponComponent>("UTPSWeaponComponent");
 }
 
 void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -38,7 +42,6 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSPlayerCharacter::Move);
 
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATPSPlayerCharacter::Look);
-
     }
 }
 
