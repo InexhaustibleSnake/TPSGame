@@ -19,6 +19,4 @@ public:
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UTPSRespawnComponent> RespawnComponent;
-
-
 };

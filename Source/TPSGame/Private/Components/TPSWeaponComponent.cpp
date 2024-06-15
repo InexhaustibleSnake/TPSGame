@@ -126,6 +126,8 @@ void UTPSWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
     CurrentWeapon = nullptr;
     for (auto Weapon : SpawnedWeapons)
     {
+        if (!Weapon) continue;
+
         Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
         Weapon->Destroy();
     }

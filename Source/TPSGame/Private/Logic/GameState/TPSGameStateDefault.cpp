@@ -41,7 +41,9 @@ void ATPSGameStateDefault::GameTimerUpdate()
 
     GetWorldTimerManager().ClearTimer(MatchTimer);
 
-    SetMatchState(MatchState::Ended);
+        OnMatchStateChanged.Broadcast(MatchState::Ended);
+
+    //SetMatchState(MatchState::Ended);
 }
 
 void ATPSGameStateDefault::ResetTimer()
