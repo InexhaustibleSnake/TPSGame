@@ -51,7 +51,7 @@ void ATPSBaseProjectile::OnProjectileHit(
     MovementComponent->StopMovementImmediately();
 
     UGameplayStatics::ApplyRadialDamage(GetWorld(), DamageAmount, GetActorLocation(), DamageRadius, UDamageType::StaticClass(),
-        {GetOwner()}, this, GetController(), DoFullDamage);
+        {}, this, GetController(), DoFullDamage);
 
     Destroy();
 }
