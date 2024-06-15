@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "TPSBaseWeapon.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
+
 USTRUCT(BlueprintType)
 struct FAmmoData
 {
@@ -39,6 +42,10 @@ protected:
 
     virtual void MakeShot();
 
+    int32 GetCurrentShot() const { return CurrentShot; }
+
+    void SetCurrentShot(int32 Amount);
+
     UFUNCTION(Server, Reliable)
     void ServerStartFire();
     void ServerStartFire_Implementation();
@@ -61,8 +68,13 @@ protected:
 
     bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
 
+    UFUNCTION()
+    virtual void OnRep_CurrentShot();
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<USkeletalMeshComponent> WeaponMesh;
+
+    UNiagaraComponent* SpawnMuzzleFX();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TPSBaseWeapon")
     float TraceMaxDistance = 5000.0f;
@@ -73,4 +85,13 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ammo")
     FAmmoData DefaultAmmoData;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    TObjectPtr<UNiagaraSystem> MuzzleFX;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FName MuzzleSocketName = "MuzzleSocket";
+
+private:
+    UPROPERTY(ReplicatedUsing = OnRep_CurrentShot)
+    int32 CurrentShot = 0;
 };

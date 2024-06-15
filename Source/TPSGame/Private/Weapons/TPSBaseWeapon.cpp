@@ -4,6 +4,8 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 ATPSBaseWeapon::ATPSBaseWeapon()
 {
@@ -30,8 +32,6 @@ void ATPSBaseWeapon::StartFire()
     {
         ServerStartFire();
     }
-
-    MakeShot();
 }
 
 void ATPSBaseWeapon::ServerStartFire_Implementation()
@@ -66,7 +66,7 @@ void ATPSBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, c
 void ATPSBaseWeapon::DecreaseAmmo()
 {
     if (CurrentAmmo.Bullets == 0) return;
-    
+
     --CurrentAmmo.Bullets;
 
     if (IsClipEmpty() && !IsAmmoEmpty())
@@ -120,9 +120,24 @@ bool ATPSBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
     return true;
 }
 
+void ATPSBaseWeapon::OnRep_CurrentShot() {}
+
+UNiagaraComponent* ATPSBaseWeapon::SpawnMuzzleFX()
+{
+    return UNiagaraFunctionLibrary::SpawnSystemAttached(
+        MuzzleFX, WeaponMesh, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
+}
+
+void ATPSBaseWeapon::SetCurrentShot(int32 Amount)
+{
+    CurrentShot = Amount;
+    OnRep_CurrentShot();
+}
+
 void ATPSBaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME_CONDITION(ATPSBaseWeapon, CurrentAmmo, COND_OwnerOnly);
+    DOREPLIFETIME_CONDITION(ATPSBaseWeapon, CurrentShot, COND_SkipOwner);
 }

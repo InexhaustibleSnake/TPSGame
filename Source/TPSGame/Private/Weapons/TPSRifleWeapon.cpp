@@ -3,8 +3,28 @@
 #include "Weapons/TPSRifleWeapon.h"
 #include "Engine/DamageEvents.h"
 #include "DrawDebugHelpers.h"
+#include "Net/UnrealNetwork.h"
+#include "NiagaraComponent.h"
 
-void ATPSRifleWeapon::MakeShot() 
+void ATPSRifleWeapon::StartFire()
+{
+    Super::StartFire();
+
+    GetWorldTimerManager().SetTimer(WeaponShotTimer, this, &ATPSRifleWeapon::MakeShot, TimeBetweenShots, true);
+
+    MakeShot();
+}
+
+void ATPSRifleWeapon::StopFire()
+{
+    Super::StopFire();
+
+    GetWorldTimerManager().ClearTimer(WeaponShotTimer);
+
+    SetCurrentShot(0);
+}
+
+void ATPSRifleWeapon::MakeShot()
 {
     if (!GetWorld() || IsAmmoEmpty())
     {
@@ -32,6 +52,8 @@ void ATPSRifleWeapon::MakeShot()
     DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 5.0f);
 
     DecreaseAmmo();
+
+    SetCurrentShot(GetCurrentShot() + 1);
 }
 
 void ATPSRifleWeapon::MakeDamage(const FHitResult& HitResult)
@@ -42,4 +64,36 @@ void ATPSRifleWeapon::MakeDamage(const FHitResult& HitResult)
     FPointDamageEvent PointDamageEvent;
     PointDamageEvent.HitInfo = HitResult;
     DamagedActor->TakeDamage(DamageAmount, PointDamageEvent, GetOwnerController(), this);
+}
+
+void ATPSRifleWeapon::OnRep_CurrentShot()
+{
+    if (GetNetMode() == ENetMode::NM_DedicatedServer) return;
+
+    if (GetCurrentShot() == 0)
+    {
+        SetMuzzleFXVisibility(false);
+        return;
+    }
+
+    InitMuzzleFX();
+}
+
+void ATPSRifleWeapon::InitMuzzleFX()
+{
+    if (!MuzzleFXComponent)
+    {
+        MuzzleFXComponent = SpawnMuzzleFX();
+    }
+
+    SetMuzzleFXVisibility(true);
+}
+
+void ATPSRifleWeapon::SetMuzzleFXVisibility(bool IsVisible)
+{
+    if (!MuzzleFXComponent) return;
+
+    MuzzleFXComponent->SetPaused(!IsVisible);
+
+    MuzzleFXComponent->SetVisibility(IsVisible);
 }
