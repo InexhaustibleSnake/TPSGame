@@ -7,13 +7,13 @@
 #include "TPSGameStateDefault.generated.h"
 
 UENUM(BlueprintType)
-enum class MatchState : uint8
+enum class EMatchState : uint8
 {
     Started,
     Ended
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchStateChangedSignature, MatchState, NewState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchStateChangedSignature, EMatchState, NewState);
 
 UCLASS()
 class TPSGAME_API ATPSGameStateDefault : public AGameStateBase
@@ -41,7 +41,7 @@ protected:
 
     void ResetTimer();
 
-    void SetMatchState(const MatchState NewState);
+    void SetMatchState(const EMatchState NewState);
 
     UFUNCTION()
     void OnRep_MatchState();
@@ -53,7 +53,7 @@ protected:
     float RemainingMatchTime = 10.0f;
 
     UPROPERTY(ReplicatedUsing = OnRep_MatchState)
-    MatchState CurrentMatchState;
+    EMatchState CurrentMatchState;
 
     FTimerHandle MatchTimer;
 };

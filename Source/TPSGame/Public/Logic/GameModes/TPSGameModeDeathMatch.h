@@ -26,4 +26,7 @@ protected:
     void StartRespawn(AController* Controller);
 
     void AddPlayerScores(AController* Controller, float Amount);
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ATPSGameModeDeathMatch")
+    float ScoresForKill = 1.0f;
 };

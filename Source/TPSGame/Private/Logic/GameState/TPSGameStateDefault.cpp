@@ -13,17 +13,7 @@ void ATPSGameStateDefault::BeginPlay()
 
 void ATPSGameStateDefault::RestartGame()
 {
-    if (GetWorld())
-    {
-     /*   auto AIRGameMode = Cast<AAIRRaceGameMode>(GetWorld()->GetAuthGameMode());
-
-        if (AIRGameMode)
-        {
-            AIRGameMode->RestartGame();
-        }*/
-    }
-
-    SetMatchState(MatchState::Started);
+    SetMatchState(EMatchState::Started);
 }
 
 void ATPSGameStateDefault::StartTimer()
@@ -41,9 +31,7 @@ void ATPSGameStateDefault::GameTimerUpdate()
 
     GetWorldTimerManager().ClearTimer(MatchTimer);
 
-        OnMatchStateChanged.Broadcast(MatchState::Ended);
-
-    //SetMatchState(MatchState::Ended);
+    SetMatchState(EMatchState::Ended);
 }
 
 void ATPSGameStateDefault::ResetTimer()
@@ -53,7 +41,7 @@ void ATPSGameStateDefault::ResetTimer()
     StartTimer();
 }
 
-void ATPSGameStateDefault::SetMatchState(const MatchState NewState)
+void ATPSGameStateDefault::SetMatchState(const EMatchState NewState)
 {
     CurrentMatchState = NewState;
     OnRep_MatchState();
@@ -63,7 +51,7 @@ void ATPSGameStateDefault::OnRep_MatchState()
 {
     OnMatchStateChanged.Broadcast(CurrentMatchState);
 
-    if (CurrentMatchState == MatchState::Started)
+    if (CurrentMatchState == EMatchState::Started)
     {
         ResetTimer();
     }

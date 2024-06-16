@@ -17,7 +17,7 @@ void ATPSGameModeDeathMatch::OnPlayerKilled(AController* KillerController, ACont
 {
     if (KillerController != VictimController)
     {
-        AddPlayerScores(KillerController, 1.0f);
+        AddPlayerScores(KillerController, ScoresForKill);
     }
 
     StartRespawn(VictimController);
@@ -55,5 +55,5 @@ void ATPSGameModeDeathMatch::AddPlayerScores(AController* Controller, float Amou
     auto PlayerState = Controller->GetPlayerState<ATPSDefaultPlayerState>();
     if (!PlayerState) return;
 
-    PlayerState->AddScores(1);
+    PlayerState->AddScores(Amount);
 }
