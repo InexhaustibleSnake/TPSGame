@@ -30,11 +30,17 @@ protected:
     UFUNCTION(BlueprintCallable, Category = "TPSCharacterAnimInstance")
     float GetOwnerPawnMaxWalkSpeed() const;
 
+    UFUNCTION(BlueprintCallable, Category = "TPSCharacterAnimInstance")
+    float GetOwnerPawnAimRotation() const;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TPSCharacterAnimInstance")
     float MovementVelocity = 0.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TPSCharacterAnimInstance")
     float MovementDirection = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TPSCharacterAnimInstance")
+    float AimRotation = 0.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TPSCharacterAnimInstance")
     bool IsFalling = false;

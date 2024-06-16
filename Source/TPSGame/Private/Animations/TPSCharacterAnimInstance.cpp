@@ -5,7 +5,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-void UTPSCharacterAnimInstance::NativeBeginPlay() 
+void UTPSCharacterAnimInstance::NativeBeginPlay()
 {
     Super::NativeBeginPlay();
 
@@ -19,6 +19,8 @@ void UTPSCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     MovementVelocity = GetOwningPawnMovementVelocityNormalized();
 
     MovementDirection = GetOwningPawnMovementDirection();
+
+    AimRotation = GetOwnerPawnAimRotation();
 
     IsFalling = !FMath::IsNearlyZero(GetOwningPawnMovementVector().Z);
 }
@@ -43,6 +45,13 @@ float UTPSCharacterAnimInstance::GetOwnerPawnMaxWalkSpeed() const
     if (!OwnerCharacter || !OwnerCharacter->GetCharacterMovement()) return 0.0f;
 
     return OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed;
+}
+
+float UTPSCharacterAnimInstance::GetOwnerPawnAimRotation() const
+{
+    if (!OwnerCharacter) return 0.0f;
+
+    return UKismetMathLibrary::ClampAngle(OwnerCharacter->GetBaseAimRotation().Pitch, -90.0f, 90.0f);
 }
 
 float UTPSCharacterAnimInstance::GetOwningPawnMovementDirection() const
