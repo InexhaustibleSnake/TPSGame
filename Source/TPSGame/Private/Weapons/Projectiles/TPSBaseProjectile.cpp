@@ -35,9 +35,12 @@ void ATPSBaseProjectile::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (MovementComponent)
+    if (HasAuthority())
     {
-        MovementComponent->Velocity = ShotDirection * MovementComponent->InitialSpeed;
+        if (MovementComponent)
+        {
+            MovementComponent->Velocity = ShotDirection * MovementComponent->InitialSpeed;
+        }
     }
 
     if (CollisionComponent)
@@ -49,19 +52,22 @@ void ATPSBaseProjectile::BeginPlay()
     SetLifeSpan(LifeSeconds);
 }
 
-void ATPSBaseProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ATPSBaseProjectile::SetIsExploded(bool IsExploded)
 {
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    DOREPLIFETIME(ATPSBaseProjectile, Exploded);
+    Exploded = IsExploded;
+    OnRep_Exploded();
 }
 
 void ATPSBaseProjectile::OnRep_Exploded()
 {
     auto SpawnedNiagara = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
         this, ExplodeFX, GetActorLocation(), GetActorRotation(), GetActorScale3D(), true, true, ENCPoolMethod::AutoRelease);
+
     if (!SpawnedNiagara) return;
+
     SpawnedNiagara->OnSystemFinished.AddDynamic(this, &ATPSBaseProjectile::OnNiagaraFinished);
+
+    SetActorHiddenInGame(true);
 }
 
 void ATPSBaseProjectile::OnNiagaraFinished(UNiagaraComponent* PSystem)
@@ -72,19 +78,23 @@ void ATPSBaseProjectile::OnNiagaraFinished(UNiagaraComponent* PSystem)
 void ATPSBaseProjectile::OnProjectileHit(
     UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    if (!GetWorld()) return;
-
-    Exploded = true;
-    OnRep_Exploded();
+    UGameplayStatics::ApplyRadialDamage(
+        this, DamageAmount, Hit.Location, DamageRadius, UDamageType::StaticClass(), {}, this, GetController(), DoFullDamage);
 
     MovementComponent->StopMovementImmediately();
 
-    UGameplayStatics::ApplyRadialDamage(
-        GetWorld(), DamageAmount, GetActorLocation(), DamageRadius, UDamageType::StaticClass(), {}, this, GetController(), DoFullDamage);
+    SetIsExploded(true);
 }
 
 AController* ATPSBaseProjectile::GetController() const
 {
     const auto Pawn = Cast<APawn>(GetOwner());
     return Pawn ? Pawn->GetController() : nullptr;
+}
+
+void ATPSBaseProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ATPSBaseProjectile, Exploded);
 }

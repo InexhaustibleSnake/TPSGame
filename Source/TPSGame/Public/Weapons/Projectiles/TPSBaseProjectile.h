@@ -24,6 +24,8 @@ protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+    void SetIsExploded(bool IsExploded);
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
@@ -33,7 +35,7 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "Components")
     TObjectPtr<UProjectileMovementComponent> MovementComponent;
 
-        UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UNiagaraSystem> ExplodeFX;
 
     UFUNCTION()
