@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/TPSBaseCharacter.h"
+#include "Components/TimelineComponent.h"
 #include "TPSPlayerCharacter.generated.h"
 
 class UCameraComponent;
@@ -24,6 +25,8 @@ public:
     ATPSPlayerCharacter();
 
 protected:
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     void Move(const FInputActionValue& Value);
@@ -36,7 +39,13 @@ protected:
 
     void Reload();
 
-    void SetTargeting(bool IsTargeting);
+    UFUNCTION()
+    void ChangeFOV(float Alpha);
+
+    UFUNCTION()
+    void OnPlayerTargeting(bool IsTargeting);
+
+    void SetupTargeting();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UCameraComponent> MainCamera;
@@ -47,14 +56,17 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UTPSWeaponComponent> TPSWeaponComponent;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Aim")
-    UCurveFloat* TargetingCurve = nullptr;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Targeting")
+    TObjectPtr<UCurveFloat> TargetingCurve = nullptr;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Aim")
-    float TargetingTime = 2.0f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Targeting")
+    float TargetingTime = 1.0f;
 
-    UPROPERTY(BlueprintReadOnly, Category = "Aim")
-    bool Targeting = false;
+    UPROPERTY(BlueprintReadOnly, Category = "Targeting")
+    float TargetingFOV = 45.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Targeting")
+    float NonTargetingFOV = 90.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -85,4 +97,7 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     FName SpringArmAttachName = "";
+
+private:
+    FTimeline TargetingTimeline;
 };

@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 
 #include "Components/TPSWeaponComponent.h"
+#include "Components/TimelineComponent.h"
+#include "Curves/CurveFloat.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -21,7 +23,20 @@ ATPSPlayerCharacter::ATPSPlayerCharacter()
     MainCamera->SetupAttachment(SpringArm);
 
     TPSWeaponComponent = CreateDefaultSubobject<UTPSWeaponComponent>("UTPSWeaponComponent");
+}
 
+void ATPSPlayerCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    SetupTargeting();
+}
+
+void ATPSPlayerCharacter::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    TargetingTimeline.TickTimeline(DeltaSeconds);
 }
 
 void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -52,6 +67,9 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::ChangeWeapon);
 
         EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::Reload);
+
+        EnhancedInputComponent->BindAction(TargetingAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::OnPlayerTargeting, true);
+        EnhancedInputComponent->BindAction(TargetingAction, ETriggerEvent::Completed, this, &ATPSPlayerCharacter::OnPlayerTargeting, false);
     }
 }
 
@@ -103,9 +121,27 @@ void ATPSPlayerCharacter::Reload()
     TPSWeaponComponent->Reload();
 }
 
-void ATPSPlayerCharacter::SetTargeting(bool IsTargeting)
+void ATPSPlayerCharacter::ChangeFOV(float Alpha)
 {
-    if (!TPSWeaponComponent) return;
+    if (!MainCamera) return;
 
-    
+    MainCamera->FieldOfView = FMath::Lerp(NonTargetingFOV, TargetingFOV, Alpha);
+}
+
+void ATPSPlayerCharacter::OnPlayerTargeting(bool IsTargeting)
+{
+    IsTargeting ? TargetingTimeline.Play() : TargetingTimeline.Reverse();
+}
+
+void ATPSPlayerCharacter::SetupTargeting()
+{
+    if (!TargetingCurve) return;
+
+    FOnTimelineFloat TargetingUpdate;
+    TargetingUpdate.BindUFunction(this, FName("ChangeFOV"));
+
+    TargetingTimeline.AddInterpFloat(TargetingCurve, TargetingUpdate);
+    TargetingTimeline.SetLooping(false);
+    TargetingTimeline.SetTimelineLength(1.0f);
+    TargetingTimeline.SetPlayRate(TargetingTime);
 }
