@@ -19,7 +19,7 @@ struct FAmmoData
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (ClampMin = "1"))
     int32 Bullets = 30;
 
-    UPROPERTY(NotReplicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (EditCondition = "!InfiniteAmmo"),
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (EditCondition = "!InfiniteAmmo"),
         meta = (ClampMin = "0"))
     int32 Clips = 3;
 
@@ -41,6 +41,8 @@ public:
     bool IsAmmoEmpty() const;
 
     bool IsClipFull() const;
+
+    bool IsClipEmpty() const;
 
     void ChangeClip();
 
@@ -69,8 +71,6 @@ protected:
     void DecreaseAmmo();
 
     AController* GetOwnerController() const;
-
-    bool IsClipEmpty() const;
 
     bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
 

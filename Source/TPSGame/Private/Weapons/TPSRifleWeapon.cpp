@@ -2,8 +2,6 @@
 
 #include "Weapons/TPSRifleWeapon.h"
 #include "Engine/DamageEvents.h"
-#include "DrawDebugHelpers.h"
-#include "Net/UnrealNetwork.h"
 #include "NiagaraComponent.h"
 
 void ATPSRifleWeapon::StartFire()
@@ -26,7 +24,7 @@ void ATPSRifleWeapon::StopFire()
 
 void ATPSRifleWeapon::MakeShot()
 {
-    if (!GetWorld() || IsAmmoEmpty())
+    if (!GetWorld() || IsClipEmpty())
     {
         StopFire();
         OnAmmoEmpty.ExecuteIfBound();

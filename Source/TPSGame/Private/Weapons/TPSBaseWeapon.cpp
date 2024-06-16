@@ -15,6 +15,8 @@ ATPSBaseWeapon::ATPSBaseWeapon()
     SetRootComponent(WeaponMesh);
 
     bReplicates = true;
+
+    NetUpdateFrequency = 15.0f;
 }
 
 void ATPSBaseWeapon::BeginPlay()
@@ -65,7 +67,7 @@ void ATPSBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, c
 
 void ATPSBaseWeapon::DecreaseAmmo()
 {
-    if (CurrentAmmo.Bullets == 0) return;
+    if (!HasAuthority() || CurrentAmmo.Bullets == 0) return;
 
     --CurrentAmmo.Bullets;
 
@@ -77,10 +79,8 @@ void ATPSBaseWeapon::DecreaseAmmo()
 
 void ATPSBaseWeapon::ChangeClip()
 {
-    if (!CurrentAmmo.InfiniteAmmo)
-    {
-        if (CurrentAmmo.Clips == 0) return;
-
+    if (!CurrentAmmo.InfiniteAmmo && CurrentAmmo.Clips != 0)
+    { 
         --CurrentAmmo.Clips;
     }
     CurrentAmmo.Bullets = DefaultAmmoData.Bullets;

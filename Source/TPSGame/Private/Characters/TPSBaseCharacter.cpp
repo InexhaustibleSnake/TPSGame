@@ -2,6 +2,8 @@
 
 #include "Characters/TPSBaseCharacter.h"
 #include "Components/TPSHealthComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ATPSBaseCharacter::ATPSBaseCharacter()
 {
@@ -10,6 +12,16 @@ ATPSBaseCharacter::ATPSBaseCharacter()
     TPSHealthComponent = CreateDefaultSubobject<UTPSHealthComponent>("TPSHealthComponent");
 
     SetupCharacterMesh();
+}
+
+void ATPSBaseCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if (TPSHealthComponent)
+    {
+        TPSHealthComponent->OnDeath.AddDynamic(this, &ATPSBaseCharacter::OnDeath);
+    }
 }
 
 void ATPSBaseCharacter::SetupCharacterMesh()
@@ -28,4 +40,12 @@ void ATPSBaseCharacter::SetupCharacterMesh()
     FRotator MeshRotation(0.0f, -90.0f, 0.0f);
 
     GetMesh()->SetRelativeLocationAndRotation(MeshLocation, MeshRotation);
+}
+
+void ATPSBaseCharacter::OnDeath() 
+{
+    GetCharacterMovement()->DisableMovement();
+    SetLifeSpan(AfterDeathLifeSpan);
+
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 }

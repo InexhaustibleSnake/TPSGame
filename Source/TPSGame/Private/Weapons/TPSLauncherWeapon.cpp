@@ -14,7 +14,7 @@ void ATPSLauncherWeapon::StartFire()
 
 void ATPSLauncherWeapon::MakeShot()
 {
-    if (!GetWorld() || IsAmmoEmpty() || IsClipEmpty()) return;
+    if (!GetWorld() || IsClipEmpty()) return;
 
     FVector TraceStart, TraceEnd;
     if (!GetTraceData(TraceStart, TraceEnd)) return;

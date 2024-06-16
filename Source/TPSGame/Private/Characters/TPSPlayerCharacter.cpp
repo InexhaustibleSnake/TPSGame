@@ -15,7 +15,7 @@
 ATPSPlayerCharacter::ATPSPlayerCharacter()
 {
     SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-    SpringArm->SetupAttachment(GetRootComponent());
+    SpringArm->SetupAttachment(GetMesh());
 
     SpringArm->bUsePawnControlRotation = true;
 
@@ -71,6 +71,19 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(TargetingAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::OnPlayerTargeting, true);
         EnhancedInputComponent->BindAction(TargetingAction, ETriggerEvent::Completed, this, &ATPSPlayerCharacter::OnPlayerTargeting, false);
     }
+}
+
+void ATPSPlayerCharacter::OnDeath()
+{
+    if (TPSWeaponComponent)
+    {
+        TPSWeaponComponent->StopFire();
+    }
+
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    GetMesh()->SetSimulatePhysics(true);
+
+    OnPlayerTargeting(false);
 }
 
 void ATPSPlayerCharacter::Move(const FInputActionValue& Value)

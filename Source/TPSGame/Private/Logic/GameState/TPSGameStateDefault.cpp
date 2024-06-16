@@ -62,5 +62,5 @@ void ATPSGameStateDefault::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME_CONDITION(ATPSGameStateDefault, RemainingMatchTime, COND_InitialOnly);
-    DOREPLIFETIME(ATPSGameStateDefault, CurrentMatchState);
+    DOREPLIFETIME_CONDITION(ATPSGameStateDefault, CurrentMatchState, COND_InitialOnly);
 }

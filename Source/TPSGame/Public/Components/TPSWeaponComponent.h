@@ -41,11 +41,18 @@ protected:
     void ServerEquipWeapon(const int32 WeaponIndex);
     void ServerEquipWeapon_Implementation(const int32 WeaponIndex);
 
+    UFUNCTION(Server, Reliable)
+    void ServerReload();
+    void ServerReload_Implementation();
+
     UFUNCTION()
     void OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon);
 
     UFUNCTION()
     void OnRep_Reloading();
+
+    UFUNCTION()
+    void OnReloadFinished();
 
     void AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName SocketName);
 
@@ -69,7 +76,7 @@ protected:
     TObjectPtr<UAnimMontage> EquipMontage = nullptr;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponComponent")
-    TObjectPtr<UAnimMontage> ReloadMontage = nullptr;
+    TMap<TSubclassOf<ATPSBaseWeapon>, TObjectPtr<UAnimMontage>> ReloadMontageData;
 
     TObjectPtr<USkeletalMeshComponent> GetOwnerMesh() const;
 
@@ -78,4 +85,24 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponent")
     FName WeaponSpineSocketName = "WeaponSpineSocket";
+
+    template <typename T>
+    static T* FindNotifyByClass(UAnimSequenceBase* Animation)
+    {
+        if (!Animation) return nullptr;
+
+        const auto NotifyEvents = Animation->Notifies;
+        for (auto NotifyEvent : NotifyEvents)
+        {
+            auto AnimNotify = Cast<T>(NotifyEvent.Notify);
+            if (AnimNotify)
+            {
+                return AnimNotify;
+            }
+        }
+        return nullptr;
+    }
+
+private:
+    FTimerHandle ReloadTimer;
 };

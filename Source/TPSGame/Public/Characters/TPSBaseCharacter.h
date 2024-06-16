@@ -17,8 +17,15 @@ public:
     ATPSBaseCharacter();
 
 protected:
+    virtual void BeginPlay() override;
     void SetupCharacterMesh();
+
+    UFUNCTION()
+    virtual void OnDeath();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UTPSHealthComponent> TPSHealthComponent;
+
+        UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ATPSBaseCharacter")
+    float AfterDeathLifeSpan = 5.0f;
 };

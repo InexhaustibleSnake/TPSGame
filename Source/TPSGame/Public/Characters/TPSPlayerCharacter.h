@@ -29,6 +29,8 @@ protected:
     virtual void Tick(float DeltaSeconds) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    virtual void OnDeath() override;
+
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
 
@@ -94,9 +96,6 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     FVector2D LookInputScale = FVector2D(90.0f, 90.0f);
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-    FName SpringArmAttachName = "";
 
 private:
     FTimeline TargetingTimeline;

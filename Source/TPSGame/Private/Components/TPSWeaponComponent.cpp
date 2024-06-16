@@ -4,6 +4,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Weapons/TPSBaseWeapon.h"
 #include "GameFramework/Character.h"
+#include "Animation/AnimMontage.h"
 
 UTPSWeaponComponent::UTPSWeaponComponent()
 {
@@ -69,7 +70,19 @@ void UTPSWeaponComponent::Reload()
 {
     if (!CurrentWeapon || CurrentWeapon->IsAmmoEmpty() || CurrentWeapon->IsClipFull()) return;
 
-    PlayReloadMontage();
+    if (!GetOwner()->HasAuthority())
+    {
+        ServerReload();
+
+        return;
+    }
+
+    SetIsReloading(true);
+}
+
+void UTPSWeaponComponent::ServerReload_Implementation()
+{
+    Reload();
 }
 
 void UTPSWeaponComponent::PlayReloadMontage()
@@ -79,7 +92,18 @@ void UTPSWeaponComponent::PlayReloadMontage()
     auto PlayerCharacter = Cast<ACharacter>(GetOwner());
     if (!PlayerCharacter) return;
 
-    PlayerCharacter->PlayAnimMontage(ReloadMontage);
+    if (!ReloadMontageData.Contains(CurrentWeapon.GetClass())) return;
+
+    const auto MontageToPlay = ReloadMontageData[CurrentWeapon.GetClass()];
+
+    if (!MontageToPlay) return;
+
+    PlayerCharacter->PlayAnimMontage(MontageToPlay);
+
+    if (!GetOwner()->HasAuthority()) return;
+
+    GetWorld()->GetTimerManager().SetTimer(
+        ReloadTimer, this, &UTPSWeaponComponent::OnReloadFinished, MontageToPlay->GetPlayLength(), false);
 }
 
 void UTPSWeaponComponent::SetIsReloading(bool IsReloading)
@@ -128,6 +152,16 @@ void UTPSWeaponComponent::OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon)
 
 void UTPSWeaponComponent::OnRep_Reloading()
 {
+    if (Reloading)
+    {
+        PlayReloadMontage();
+    }
+}
+
+void UTPSWeaponComponent::OnReloadFinished()
+{
+    SetIsReloading(false);
+
     if (!Reloading && CurrentWeapon)
     {
         CurrentWeapon->ChangeClip();
@@ -143,7 +177,7 @@ void UTPSWeaponComponent::AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName
 
 bool UTPSWeaponComponent::CanFire() const
 {
-    return CurrentWeapon && !CurrentWeapon->IsAmmoEmpty() && !Reloading;
+    return CurrentWeapon && !Reloading;
 }
 
 FTransform UTPSWeaponComponent::GetSocketTransform(const FName SocketName) const
@@ -179,5 +213,6 @@ void UTPSWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UTPSWeaponComponent, CurrentWeapon);
+    DOREPLIFETIME(UTPSWeaponComponent, Reloading);
     DOREPLIFETIME_CONDITION(UTPSWeaponComponent, SpawnedWeapons, COND_OwnerOnly);
 }
