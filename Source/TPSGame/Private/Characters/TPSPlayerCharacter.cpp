@@ -13,12 +13,15 @@
 ATPSPlayerCharacter::ATPSPlayerCharacter()
 {
     SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-    SpringArm->SetupAttachment(GetMesh());
+    SpringArm->SetupAttachment(GetRootComponent());
+
+    SpringArm->bUsePawnControlRotation = true;
 
     MainCamera = CreateDefaultSubobject<UCameraComponent>("MainCamera");
     MainCamera->SetupAttachment(SpringArm);
 
     TPSWeaponComponent = CreateDefaultSubobject<UTPSWeaponComponent>("UTPSWeaponComponent");
+
 }
 
 void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -47,6 +50,8 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &ATPSPlayerCharacter::StopFire);
 
         EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::ChangeWeapon);
+
+        EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Started, this, &ATPSPlayerCharacter::Reload);
     }
 }
 
@@ -66,8 +71,8 @@ void ATPSPlayerCharacter::Look(const FInputActionValue& Value)
 
     FVector2D LookVector = Value.Get<FVector2D>();
 
-    AddControllerYawInput(LookVector.X * DeltatTime * LookInputScale.X);
-    AddControllerPitchInput(LookVector.Y * DeltatTime * LookInputScale.Y);
+    AddControllerYawInput(LookVector.X);
+    AddControllerPitchInput(LookVector.Y);
 }
 
 void ATPSPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
@@ -89,4 +94,18 @@ void ATPSPlayerCharacter::StopFire()
     if (!TPSWeaponComponent) return;
 
     TPSWeaponComponent->StopFire();
+}
+
+void ATPSPlayerCharacter::Reload()
+{
+    if (!TPSWeaponComponent) return;
+
+    TPSWeaponComponent->Reload();
+}
+
+void ATPSPlayerCharacter::SetTargeting(bool IsTargeting)
+{
+    if (!TPSWeaponComponent) return;
+
+    
 }

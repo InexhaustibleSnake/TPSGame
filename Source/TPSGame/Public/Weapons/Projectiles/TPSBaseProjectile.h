@@ -7,6 +7,7 @@
 #include "TPSBaseProjectile.generated.h"
 
 class USphereComponent;
+class UNiagaraSystem;
 class UProjectileMovementComponent;
 
 UCLASS()
@@ -21,6 +22,7 @@ public:
 
 protected:
     virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
@@ -31,6 +33,18 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "Components")
     TObjectPtr<UProjectileMovementComponent> MovementComponent;
 
+        UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    TObjectPtr<UNiagaraSystem> ExplodeFX;
+
+    UFUNCTION()
+    void OnRep_Exploded();
+
+    UFUNCTION()
+    void OnNiagaraFinished(UNiagaraComponent* PSystem);
+
+    UPROPERTY(ReplicatedUsing = OnRep_Exploded)
+    bool Exploded = false;
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon Projectile")
     float DamageRadius = 200.0f;
 
@@ -49,6 +63,8 @@ private:
     UFUNCTION()
     void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
         const FHitResult& Hit);
+
+    
 
     AController* GetController() const;
 };

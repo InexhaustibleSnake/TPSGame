@@ -75,6 +75,17 @@ void ATPSBaseWeapon::DecreaseAmmo()
     }
 }
 
+void ATPSBaseWeapon::ChangeClip()
+{
+    if (!CurrentAmmo.InfiniteAmmo)
+    {
+        if (CurrentAmmo.Clips == 0) return;
+
+        --CurrentAmmo.Clips;
+    }
+    CurrentAmmo.Bullets = DefaultAmmoData.Bullets;
+}
+
 AController* ATPSBaseWeapon::GetOwnerController() const
 {
     const auto Pawn = Cast<APawn>(GetOwner());

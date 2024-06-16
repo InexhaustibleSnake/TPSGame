@@ -9,6 +9,8 @@
 class UNiagaraSystem;
 class UNiagaraComponent;
 
+DECLARE_DELEGATE(FOnAmmoEmpty);
+
 USTRUCT(BlueprintType)
 struct FAmmoData
 {
@@ -36,6 +38,12 @@ public:
     virtual void StartFire();
     virtual void StopFire();
 
+    bool IsAmmoEmpty() const;
+
+    void ChangeClip();
+
+    FOnAmmoEmpty OnAmmoEmpty;
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -59,8 +67,6 @@ protected:
     void DecreaseAmmo();
 
     AController* GetOwnerController() const;
-
-    bool IsAmmoEmpty() const;
 
     bool IsClipEmpty() const;
 

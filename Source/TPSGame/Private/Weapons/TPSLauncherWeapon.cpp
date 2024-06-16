@@ -8,6 +8,8 @@ void ATPSLauncherWeapon::StartFire()
 {
     Super::StartFire();
 
+    if (!HasAuthority()) return;
+
     MakeShot();
 }
 

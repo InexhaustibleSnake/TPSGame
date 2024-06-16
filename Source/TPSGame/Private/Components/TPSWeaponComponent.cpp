@@ -35,7 +35,7 @@ void UTPSWeaponComponent::NextWeapon()
 
 void UTPSWeaponComponent::StartFire()
 {
-    if (!CurrentWeapon) return;
+    if (!CurrentWeapon || !CanFire()) return;
 
     CurrentWeapon->StartFire();
 }
@@ -60,7 +60,30 @@ void UTPSWeaponComponent::InitWeapons()
 
         SpawnedWeapon->AttachToComponent(GetOwnerMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSpineSocketName);
         SpawnedWeapons.AddUnique(SpawnedWeapon);
+
+        SpawnedWeapon->OnAmmoEmpty.BindUObject(this, &UTPSWeaponComponent::Reload);
     }
+}
+
+void UTPSWeaponComponent::Reload()
+{
+    PlayReloadMontage();
+}
+
+void UTPSWeaponComponent::PlayReloadMontage()
+{
+    if (!CurrentWeapon) return;
+
+    auto PlayerCharacter = Cast<ACharacter>(GetOwner());
+    if (!PlayerCharacter) return;
+
+    PlayerCharacter->PlayAnimMontage(ReloadMontage);
+}
+
+void UTPSWeaponComponent::SetIsReloading(bool IsReloading)
+{
+    Reloading = IsReloading;
+    OnRep_Reloading();
 }
 
 void UTPSWeaponComponent::EquipWeapon(const int32 WeaponIndex)
@@ -101,11 +124,24 @@ void UTPSWeaponComponent::OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon)
     PlayerCharacter->PlayAnimMontage(EquipMontage);
 }
 
+void UTPSWeaponComponent::OnRep_Reloading()
+{
+    if (!Reloading && CurrentWeapon)
+    {
+        CurrentWeapon->ChangeClip();
+    }
+}
+
 void UTPSWeaponComponent::AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName SocketName)
 {
     if (!Weapon) return;
 
     Weapon->AttachToComponent(GetOwnerMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+}
+
+bool UTPSWeaponComponent::CanFire() const
+{
+    return CurrentWeapon && !CurrentWeapon->IsAmmoEmpty() && !Reloading;
 }
 
 FTransform UTPSWeaponComponent::GetSocketTransform(const FName SocketName) const

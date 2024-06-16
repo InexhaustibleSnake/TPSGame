@@ -29,6 +29,7 @@ void ATPSRifleWeapon::MakeShot()
     if (!GetWorld() || IsAmmoEmpty())
     {
         StopFire();
+        OnAmmoEmpty.ExecuteIfBound();
         return;
     }
 
@@ -48,8 +49,6 @@ void ATPSRifleWeapon::MakeShot()
         TraceFXEnd = HitResult.ImpactPoint;
         MakeDamage(HitResult);
     }
-
-    DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 5.0f);
 
     DecreaseAmmo();
 

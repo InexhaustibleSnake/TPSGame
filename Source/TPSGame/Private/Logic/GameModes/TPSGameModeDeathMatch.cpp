@@ -15,7 +15,10 @@ ATPSGameModeDeathMatch::ATPSGameModeDeathMatch()
 
 void ATPSGameModeDeathMatch::OnPlayerKilled(AController* KillerController, AController* VictimController)
 {
-    AddPlayerScores(KillerController, 1.0f);
+    if (KillerController != VictimController)
+    {
+        AddPlayerScores(KillerController, 1.0f);
+    }
 
     StartRespawn(VictimController);
 }

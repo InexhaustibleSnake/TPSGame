@@ -21,11 +21,17 @@ public:
     void StartFire();
     void StopFire();
 
+    void Reload();
+
+    void SetIsReloading(bool IsReloading);
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     void InitWeapons();
+
+    void PlayReloadMontage();
 
     void EquipWeapon(const int32 WeaponIndex);
 
@@ -38,7 +44,12 @@ protected:
     UFUNCTION()
     void OnRep_CurrentWeapon(ATPSBaseWeapon* PreviousWeapon);
 
+    UFUNCTION()
+    void OnRep_Reloading();
+
     void AttachWeaponToMesh(ATPSBaseWeapon* Weapon, const FName SocketName);
+
+    bool CanFire() const;
 
     FTransform GetSocketTransform(const FName SocketName) const;
 
@@ -51,8 +62,14 @@ protected:
     UPROPERTY(ReplicatedUsing = OnRep_CurrentWeapon, BlueprintReadOnly, Category = "WeaponComponent")
     TObjectPtr<ATPSBaseWeapon> CurrentWeapon = nullptr;
 
+    UPROPERTY(ReplicatedUsing = OnRep_Reloading, BlueprintReadOnly, Category = "WeaponComponent")
+    bool Reloading = false;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponComponent")
     TObjectPtr<UAnimMontage> EquipMontage = nullptr;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponComponent")
+    TObjectPtr<UAnimMontage> ReloadMontage = nullptr;
 
     TObjectPtr<USkeletalMeshComponent> GetOwnerMesh() const;
 

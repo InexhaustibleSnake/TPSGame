@@ -34,6 +34,10 @@ protected:
     void StartFire();
     void StopFire();
 
+    void Reload();
+
+    void SetTargeting(bool IsTargeting);
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UCameraComponent> MainCamera;
 
@@ -42,6 +46,15 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UTPSWeaponComponent> TPSWeaponComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Aim")
+    UCurveFloat* TargetingCurve = nullptr;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Aim")
+    float TargetingTime = 2.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Aim")
+    bool Targeting = false;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -59,11 +72,17 @@ protected:
     TObjectPtr<UInputAction> ShootAction;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
-    TObjectPtr<UInputAction> AimAction;
+    TObjectPtr<UInputAction> TargetingAction;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     TObjectPtr<UInputAction> ChangeWeaponAction;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
+    TObjectPtr<UInputAction> ReloadWeaponAction;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
     FVector2D LookInputScale = FVector2D(90.0f, 90.0f);
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    FName SpringArmAttachName = "";
 };
