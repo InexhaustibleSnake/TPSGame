@@ -2,7 +2,6 @@
 
 #include "Weapons/TPSLauncherWeapon.h"
 #include "Weapons/Projectiles/TPSBaseProjectile.h"
-#include "Kismet/GameplayStatics.h"
 
 void ATPSLauncherWeapon::StartFire()
 {
@@ -15,9 +14,7 @@ void ATPSLauncherWeapon::StartFire()
 
 void ATPSLauncherWeapon::MakeShot()
 {
-    if (!GetWorld()) return;
-
-    if (IsAmmoEmpty()) return;
+    if (!GetWorld() || IsAmmoEmpty() || IsClipEmpty()) return;
 
     FVector TraceStart, TraceEnd;
     if (!GetTraceData(TraceStart, TraceEnd)) return;

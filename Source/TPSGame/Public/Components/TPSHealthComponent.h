@@ -63,7 +63,7 @@ private:
 
     void SetHealth(float NewHealth);
 
-    float GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName);
+    float GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName) const;
 
     AController* GetOwnerController() const;
 

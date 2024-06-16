@@ -40,6 +40,8 @@ public:
 
     bool IsAmmoEmpty() const;
 
+    bool IsClipFull() const;
+
     void ChangeClip();
 
     FOnAmmoEmpty OnAmmoEmpty;

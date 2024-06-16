@@ -67,6 +67,8 @@ void UTPSWeaponComponent::InitWeapons()
 
 void UTPSWeaponComponent::Reload()
 {
+    if (!CurrentWeapon || CurrentWeapon->IsAmmoEmpty() || CurrentWeapon->IsClipFull()) return;
+
     PlayReloadMontage();
 }
 

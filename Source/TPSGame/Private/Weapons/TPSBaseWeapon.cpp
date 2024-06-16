@@ -97,6 +97,11 @@ bool ATPSBaseWeapon::IsAmmoEmpty() const
     return !CurrentAmmo.InfiniteAmmo && CurrentAmmo.Clips == 0 && IsClipEmpty();
 }
 
+bool ATPSBaseWeapon::IsClipFull() const
+{
+    return CurrentAmmo.Bullets == DefaultAmmoData.Bullets;
+}
+
 bool ATPSBaseWeapon::IsClipEmpty() const
 {
     return CurrentAmmo.Bullets == 0;

@@ -38,7 +38,7 @@ void UTPSHealthComponent::OnTakeRadialDamage(AActor* DamagedActor, float Damage,
     ApplyDamage(Damage, InstigatedBy);
 }
 
-float UTPSHealthComponent::GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName)
+float UTPSHealthComponent::GetPointDamageModifier(AActor* DamagedActor, const FName& BoneName) const
 {
     const auto Character = Cast<ACharacter>(DamagedActor);
     if (!Character || !Character->GetMesh() || !Character->GetMesh()->GetBodyInstance(BoneName)) return 1.0f;
@@ -58,7 +58,7 @@ AController* UTPSHealthComponent::GetOwnerController() const
 
 void UTPSHealthComponent::ApplyDamage(float Damage, AController* InstigatedBy)
 {
-    if (Damage <= 0.0f || IsDead() || !GetWorld()) return;
+    if (Damage <= 0.0f  || IsDead() || !GetWorld()) return;
 
     SetHealth(Health - Damage);
 
@@ -66,7 +66,6 @@ void UTPSHealthComponent::ApplyDamage(float Damage, AController* InstigatedBy)
     {
         OnDeath.Broadcast();
 
-        if (!GetWorld()) return;
         const auto GameMode = Cast<ATPSGameModeDeathMatch>(GetWorld()->GetAuthGameMode());
         if (!GameMode) return;
 
