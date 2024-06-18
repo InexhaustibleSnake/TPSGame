@@ -98,12 +98,12 @@ void ATPSPlayerCharacter::Look(const FInputActionValue& Value)
 {
     if (!GetWorld()) return;
 
-    float DeltatTime = GetWorld()->GetDeltaSeconds();
+    float DeltaTime = GetWorld()->GetDeltaSeconds();
 
     FVector2D LookVector = Value.Get<FVector2D>();
 
-    AddControllerYawInput(LookVector.X);
-    AddControllerPitchInput(LookVector.Y);
+    AddControllerYawInput(LookVector.X * DeltaTime * LookInputScale.X);
+    AddControllerPitchInput(LookVector.Y * DeltaTime * LookInputScale.Y);
 }
 
 void ATPSPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
